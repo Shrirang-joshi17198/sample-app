@@ -24,15 +24,17 @@ pipeline {
             agent any
             steps {
                 script {
-                    docker.image('python:3.9-alpine').inside('-v $PWD:/app') {
-                        sh 'pip install -r /app/requirements.txt'
-                        sh 'pytest /app/app/tests/'
+                    docker.image('python:3.9-alpine').inside('-v $PWD:/flask_app') {
+                        sh 'pip install --no-cache-dir -r /flask_app/requirements.txt'
+                        sh 'pip install pytest'
+                        sh 'pip install markupsafe==2.0.1'
+                        sh 'pytest /flask_app/app/tests/'
                     }
                 }
             }
             post {
                 always {
-                    junit 'app/tests/junit_report.xml'
+                    junit '/flask_app/app/tests/junit_report.xml'
                 }
             }
         }
@@ -41,17 +43,41 @@ pipeline {
             agent any
             steps {
                 script {
-                    docker.image('python:3.9-alpine').inside('-v $PWD:/app') {
-                        sh 'docker build -t my-python-app .'
-                        sh 'docker run -p 5000:5000 my-python-app'
+                    try {
+                        docker.image('python:3.9-alpine').inside('-v $PWD:/flask_app') {
+                            sh 'docker build -t my-flask-app /flask_app'
+                            sh 'docker run -p 5000:5000 my-flask-app'
+                        }
+                    } catch (Exception e) {
+                        echo "Deployment failed. Rolling back..."
+                        rollback()
+                        error "Deployment failed."
                     }
                 }
             }
             post {
                 failure {
-                    sh 'docker rm -f my-python-app'
+                    sh 'docker rm -f my-flask-app'
                 }
             }
         }
+
+        stage('Rollback') {
+            when {
+                expression { currentBuild.resultIsBetterOrEqualTo('FAILURE') }
+            }
+            steps {
+                script {
+                    echo "Rolling back..."
+                    rollback()
+                }
+            }
+        }
+    }
+
+    def rollback() {
+        // Implement your rollback logic here
+        sh 'echo "Rollback logic goes here"'
+        // Example: sh 'docker stop my-flask-app-previous-container'
     }
 }
