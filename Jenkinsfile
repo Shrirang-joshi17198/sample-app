@@ -53,7 +53,7 @@ pipeline {
         expression { currentBuild.resultIsBetterOrEqualTo('FAILURE') }
       }
       steps {
-        sh 'docker rm -f $(docker ps -q -f name=my-flask-app)' // Stop and remove the running container
+        sh 'docker rm -f $(docker ps -q -f name=my-flask-app)'  // Stop and remove the running container
         // Additional rollback logic if needed, e.g., redeploying a previous version
       }
     }
