@@ -6,16 +6,22 @@ pipeline {
         }
     }
 
+    environment {
+        HOME = '.'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Shrirang-joshi17198/sample-app.git'  // Replace with your Git repository URL
+                // It's generally a good practice to clean workspace before checking out code
+                cleanWs()
+                checkout([$class: 'GitSCM', branches: [[name: 'main']], userRemoteConfigs: [[url: 'https://github.com/Shrirang-joshi17198/sample-app.git']]])
             }
         }
 
         stage('Build') {
             steps {
-                sh '-H pip install -r requirements.txt'
+                sh 'pip install --user -r requirements.txt'
             }
         }
 
