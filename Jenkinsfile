@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     docker.image('python:3.9-alpine').inside('-v $PWD:/app') {
-                        sh 'pip install --user -r /app/requirements.txt'
+                        sh 'pip install -r /app/requirements.txt'
                         sh 'pytest /app/app/tests/'
                     }
                 }
