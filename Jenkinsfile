@@ -74,10 +74,10 @@ pipeline {
             }
         }
     }
+}
 
-    def rollback() {
-        // Implement your rollback logic here
-        sh 'echo "Rollback logic goes here"'
-        // Example: sh 'docker stop my-flask-app-previous-container'
-    }
+def rollback() {
+    // Implement your rollback logic here
+    sh 'echo "Rollback logic goes here"'
+    // Example: sh 'docker stop my-flask-app-previous-container'
 }
