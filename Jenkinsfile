@@ -32,11 +32,8 @@ pipeline {
                     docker.withRegistry('https://hub.docker.com/', 'dockerhub') {
                         dockerImage.push()
                     }
-                    // Replace with your specific deployment steps
-                    // Option 1: Manual commands
+                    // Replace with your specific deployment steps (manual commands only)
                     sh "docker run -d -p 5000:5000 your-image-name:${env.BUILD_ID}"
-                    // Option 2: Ansible (assuming Ansible is installed)
-                    ansiblePlaybook credentialsId: 'ansible-credentials', installation: 'ansible', playbook: 'deploy.yml'
                 }
             }
         }
@@ -49,8 +46,8 @@ pipeline {
         }
 
         failure {
-            // Implement rollback tailored to your deployment mechanism
-            // ... (rollback steps remain the same)
+            // Implement rollback tailored to your manual deployment mechanism
+            // ... (rollback steps adjusted for manual actions)
         }
     }
 }
