@@ -5,7 +5,7 @@ pipeline {
         stage('Install Python') {
             steps {
                 script {
-                    sh 'apt-get update && apt-get install -y python3'
+                    sh 'sudo apt-get update && apt-get install -y python3'
                 }
             }
         }
@@ -17,12 +17,12 @@ pipeline {
                     checkout scm
                     
                     // Install dependencies
-                    sh 'python --version'
-                    sh 'pip install --no-cache-dir -r requirements.txt'
+                    sh 'sudo python --version'
+                    sh 'sudo pip install --no-cache-dir -r requirements.txt'
                     
                     // Run automated tests
-                    sh 'pip install pytest'
-                    sh 'pytest'
+                    sh 'sudo pip install pytest'
+                    sh 'sudo pytest'
                 }
             }
         }
