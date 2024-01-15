@@ -1,59 +1,56 @@
 pipeline {
     agent any
-    
+
     stages {
-        stage('Install Python') {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://your-git-repo-url'
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'sudo apt-get update && sudo apt-get install -y python3'
+                    dockerImage = docker.build("your-image-name:${env.BUILD_ID}")
                 }
             }
         }
 
-        stage('Automated Testing in CI') {
+        stage('Run Unit Tests') {
             steps {
                 script {
-                    // Checkout code from version control
-                    checkout scm
-                    
-                    // Install dependencies
-                    sh 'pip install --no-cache-dir -r requirements.txt'
-                    
-                    // Run automated tests
-                    sh 'pip install pytest'
-                    sh 'pytest'
+                    dockerImage.inside {
+                        sh "pytest tests/"
+                    }
                 }
             }
         }
-        
-        stage('Rollback Mechanism in CD') {
+
+        stage('Deploy to Staging') {
             steps {
                 script {
-                    // Deploy the application
-                    docker.build("my-flask-app")
                     docker.withRegistry('https://hub.docker.com/', 'dockerhub') {
                         dockerImage.push()
                     }
-                    
-                    // Introduce a deliberate fault
-                    // ...
-
-                    // Detect deployment failure and initiate rollback
-                    // ...
-
-                    // Confirm the rollback
-                    // ...
+                    // Replace with your specific deployment steps
+                    // Option 1: Manual commands
+                    sh "docker run -d -p 5000:5000 your-image-name:${env.BUILD_ID}"
+                    // Option 2: Ansible (assuming Ansible is installed)
+                    ansiblePlaybook credentialsId: 'ansible-credentials', installation: 'ansible', playbook: 'deploy.yml'
                 }
             }
         }
     }
-    
+
     post {
         always {
-            // Clean up
-            script {
-                sh 'docker rmi my-flask-app:latest || true' // Remove Docker image, ignoring errors
-            }
+            // Clean up workspace
+            deleteDir()
+        }
+
+        failure {
+            // Implement rollback tailored to your deployment mechanism
+            // ... (rollback steps remain the same)
         }
     }
 }
