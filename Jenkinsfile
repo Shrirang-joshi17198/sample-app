@@ -5,7 +5,7 @@ pipeline {
         stage('Install Python') {
             steps {
                 script {
-                    sh 'sudo apt-get update && apt-get install -y python3'
+                    sh 'apt-get update && apt-get install -y python3'
                 }
             }
         }
@@ -17,12 +17,11 @@ pipeline {
                     checkout scm
                     
                     // Install dependencies
-                    sh 'sudo python --version'
-                    sh 'sudo pip install --no-cache-dir -r requirements.txt'
+                    sh 'pip install --no-cache-dir -r requirements.txt'
                     
                     // Run automated tests
-                    sh 'sudo pip install pytest'
-                    sh 'sudo pytest'
+                    sh 'pip install pytest'
+                    sh 'pytest'
                 }
             }
         }
@@ -53,7 +52,7 @@ pipeline {
         always {
             // Clean up
             script {
-                sh 'docker rmi my-flask-app' // Remove Docker image
+                sh 'docker rmi my-flask-app || true' // Remove Docker image, ignoring errors
             }
         }
     }
