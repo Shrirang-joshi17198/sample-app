@@ -52,7 +52,7 @@ pipeline {
         always {
             // Clean up
             script {
-                sh 'docker rmi my-flask-app || true' // Remove Docker image, ignoring errors
+                sh 'docker rmi my-flask-app:latest || true' // Remove Docker image, ignoring errors
             }
         }
     }
