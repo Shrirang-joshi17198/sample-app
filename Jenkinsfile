@@ -9,6 +9,7 @@ pipeline {
                     checkout scm
                     
                     // Install dependencies
+                    sh 'python --version'
                     sh 'pip install --no-cache-dir -r requirements.txt'
                     
                     // Run automated tests
